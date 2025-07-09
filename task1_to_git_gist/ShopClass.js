@@ -46,6 +46,20 @@ class ProvisionStore {
   }
 }
 
+  deleteProductById(id, newProducts) {
+  
+    const newProducts = [];
+    let deletedProduct = null;
+    for(let i = 0; i<this.products.length; i++){
+      if(this.products[i].id !== id){
+      newProducts.push(this.products[i]) 
+      }else{
+        deletedProduct = this.products[i]
+         
+      }
+    }
+    return this.products = newProducts;
+}
 
   editProduct(id, updatedFields) {
     const product = this.getProductById(id);
@@ -88,3 +102,4 @@ class ProvisionStore {
   }
 }
 }
+
