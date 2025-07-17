@@ -1,5 +1,4 @@
 class ProvisionStore {
-
   #shopName;
   #location;
 
@@ -16,7 +15,7 @@ class ProvisionStore {
   addProduct(productName, cost, stockStatus) {
     const allowedStatus = ["in-stock", "low-stock", "out-of-stock"];
     if (!allowedStatus.includes(stockStatus)) {
-      console.log("Invalid stock status");
+      throw new Error("Invalid stock status");
     }
 
     const product = {
@@ -35,37 +34,38 @@ class ProvisionStore {
     return this.products;
   }
 
- getProductById(id) {
-  for (let i = 0; i < this.products.length; i++) {
-    if (this.products[i].id === id) {
-      return this.products[i];
-    } 
-    else{
-      console.log("not found")
-    }
-  }
-}
-
-  deleteProductById(id, newProducts) {
-  
-    const newProducts = [];
-    let deletedProduct = null;
-    for(let i = 0; i<this.products.length; i++){
-      if(this.products[i].id !== id){
-      newProducts.push(this.products[i]) 
-      }else{
-        deletedProduct = this.products[i]
-         
+  getProductById(id) {
+    for (let i = 0; i < this.products.length; i++) {
+      if (this.products[i].id === id) {
+        return this.products[i];
       }
     }
-    return this.products = newProducts;
-}
+    console.log("Product not found");
+    return null;
+  }
+
+  deleteProductById(id) {
+    const newProducts = [];
+    let deletedProduct = null;
+
+    for (let i = 0; i < this.products.length; i++) {
+      if (this.products[i].id !== id) {
+        newProducts.push(this.products[i]);
+      } else {
+        deletedProduct = this.products[i];
+      }
+    }
+
+    this.products = newProducts;
+    return deletedProduct;
+  }
 
   editProduct(id, updatedFields) {
     const product = this.getProductById(id);
-    if (!product){
-      console.log("Not a existing")
-    };
+    if (!product) {
+      console.log("Product not found");
+      return null;
+    }
 
     if (updatedFields.productName !== undefined) {
       product.productName = updatedFields.productName;
@@ -79,11 +79,13 @@ class ProvisionStore {
   }
 
   updateStockStatus(id, newStatus) {
-  let product = null;
+    if (!["in-stock", "low-stock", "out-of-stock"].includes(newStatus)) {
+      console.log("Invalid stock status");
+      return null;
+    }
 
-  if (
-    newStatus === "in-stock" || "low-stock" || "out-of-stock"
-  ) {
+    let product = null;
+
     for (let i = 0; i < this.products.length; i++) {
       if (this.products[i].id === id) {
         product = this.products[i];
@@ -92,14 +94,11 @@ class ProvisionStore {
       }
     }
 
-    if (product) {
-      return product;
-    } else {
-      console.log("Not a number")
+    if (!product) {
+      console.log("Product not found");
+      return null;
     }
-  } else {
-    console.log("Invalid stock status")
+
+    return product;
   }
 }
-}
-
