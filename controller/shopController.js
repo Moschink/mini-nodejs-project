@@ -6,15 +6,19 @@ const getAllProduct = (req, res) => {
 }
 const addNewProduct = (req, res) => {
     const id = Math.floor(Math.random() * 10000);
-    const title = req.body.title;
-    const description = req.body.description;
+    const productName = req.body.productName;
+    const cost = parseInt(req.body.cost); 
+    const stockStatus = req.body.stockStatus;
+    const createdAt = new Date()
 
     shop.push({
         id,
-        title,
-        description,
-        isDone: false
+        productName,
+        cost,
+        stockStatus,
+        createdAt,
     });
+    
 }
 const viewSingleProduct = (req, res) => {
     const id = req.params.id;
@@ -70,7 +74,8 @@ const deleteProduct = (req, res) =>{
     shop = updatedProduct;
     res.send({
         message: "Product deleted successfully",
-        deleteProduct
+        deletedProduct
+        
     });
 }
 
