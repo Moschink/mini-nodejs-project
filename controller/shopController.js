@@ -18,6 +18,10 @@ const addNewProduct = (req, res) => {
         stockStatus,
         createdAt,
     });
+    res.send({
+        message : "Product added successfully"
+    })
+    
     
 }
 const viewSingleProduct = (req, res) => {
