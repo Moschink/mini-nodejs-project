@@ -1,16 +1,16 @@
-// const transporter = require()
+// Array to store products (keeping your original variable name)
 let shop = [];
 
 const getAllProduct = (req, res) => {
     res.send(shop);
 }
+
 const addNewProduct = (req, res) => {
     const id = Math.floor(Math.random() * 10000);
     const productName = req.body.productName;
     const cost = parseInt(req.body.cost); 
     const stockStatus = req.body.stockStatus;
     const createdAt = new Date()
-
     shop.push({
         id,
         productName,
@@ -21,16 +21,15 @@ const addNewProduct = (req, res) => {
     res.send({
         message : "Product added successfully"
     })
-    
-    
 }
-const viewSingleProduct = (req, res) => {
-    const id = req.params.id;
-    let productFound;
 
-    for(let i = 0; i<shop.length; i++){
-        if(shop[i].id == id){
+const viewSingleProduct = async (req, res) => {
+    const id = parseInt(req.params.id); // Fixed: parse ID as integer
+    let productFound;
+    for(let i = 0; i < shop.length; i++){
+        if(shop[i].id === id){ // Fixed: use strict equality
             productFound = shop[i];
+            break; // Added break to stop searching once found
         }
     }
     if(!productFound){
@@ -43,43 +42,84 @@ const viewSingleProduct = (req, res) => {
     })
 }
 
-const updateProductStatus = (req, res) => {
-    const id = req.params.id;
-    const isDone = req.body.isDone;
-
-    const updatedProduct = [];
-
+const updateProduct = (req, res) => {
+    const id = parseInt(req.params.id);
+    const { productName, cost } = req.body;
+    
+    let updatedProduct = null;
+    
     for(let i = 0; i < shop.length; i++) {
-        if(shop[i].id == id) {
-            shop[i].isDone = isDone
+        if(shop[i].id === id) {
+            
+            if(productName !== undefined && productName !== null && productName !== "") {
+                shop[i].productName = productName;
+            }
+            if(cost !== undefined && cost !== null && cost !== "") {
+                shop[i].cost = parseInt(cost);
+            }
+            shop[i].updatedAt = new Date();
+            updatedProduct = shop[i];
+            break;
         }
-        updatedProduct.push(shop[i]);
     }
-    shop = updatedProduct;
-
+    if(!updatedProduct) {
+        return res.status(404).send({
+            message: "Product not found",
+            
+        });
+    }
     res.send({
-        message: "product updated successfully",
+        message: "Product updated successfully",
+        updatedProduct: updatedProduct,
+        allProducts: shop
+    });
+}
+
+const updateProductStatus = (req, res) => {
+    const id = parseInt(req.params.id); 
+    const status = req.params.status;
+    let productFound = false;
+    
+    for(let i = 0; i < shop.length; i++) {
+        if(shop[i].id === id) {
+            shop[i].stockStatus = status; 
+            shop[i].updatedAt = new Date();
+            productFound = true;
+            break;
+        }
+    }
+    
+    if(!productFound) {
+        return res.status(404).send("Product not found");
+    }
+    
+    res.send({
+        message: "Product status updated successfully",
         shop
     });
 }
 
-const deleteProduct = (req, res) =>{
-    const id = req.params.id;
+const deleteProduct = (req, res) => {
+    const id = parseInt(req.params.id); 
     const updatedProduct = [];
-    let deletedProduct
-
-    for(let i; i<shop.length; i++){
-        if(shop[i].id != id){
+    let deletedProduct;
+    
+    for(let i = 0; i < shop.length; i++){ 
+        if(shop[i].id !== id){ 
             updatedProduct.push(shop[i]);
-        }else{
-            deletedProduct = shop[i]
+        } else {
+            deletedProduct = shop[i];
         }
     }
+    
+    if(!deletedProduct) {
+        return res.status(404).send("Product not found");
+    }
+    
     shop = updatedProduct;
     res.send({
         message: "Product deleted successfully",
         deletedProduct
-        
     });
 }
 
@@ -87,6 +127,7 @@ module.exports = {
     addNewProduct,
     getAllProduct,
     viewSingleProduct,
+    updateProduct,        
     updateProductStatus,
     deleteProduct
 }
