@@ -77,7 +77,12 @@ const updateProduct = (req, res) => {
 
 const updateProductStatus = (req, res) => {
     const id = parseInt(req.params.id); 
-    const status = req.params.status;
+    const { status } = req.body;
+    
+    if (!status) {
+        return res.status(400).send("Status is required in request body");
+    }
+    
     let productFound = false;
     
     for(let i = 0; i < shop.length; i++) {
@@ -95,7 +100,7 @@ const updateProductStatus = (req, res) => {
     
     res.send({
         message: "Product status updated successfully",
-        shop
+        updatedProduct: shop.find(product => product.id === id)
     });
 }
 
